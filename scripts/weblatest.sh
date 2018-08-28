@@ -21,7 +21,7 @@ ln -s ../HEADER.txt latest/HEADER.txt
 # http://xxx/latest/arch/pkg/yyy.{deb,rpm,txz}
 # http://xxx/latest/all/pkg/yyy.{deb,rpm,txz}
 
-for arch in $(ls -1 | grep -v latest | grep -v all | grep -v \.txt); do
+for arch in $(ls -1 | grep -v latest | grep -v all | grep -v shared | grep -v \.txt); do
 
     mkdir latest/$arch
 
@@ -63,7 +63,7 @@ mkdir -p latest/all/kselftest
 ln -s ../../../README.txt latest/all/kselftest/README.txt
 ln -s ../../../HEADER.txt latest/all/kselftest/HEADER.txt
 
-for arch in $(ls -1 | grep -v latest | grep -v all | grep -v \.txt); do
+for arch in $(ls -1 | grep -v latest | grep -v all | grep -v shared | grep -v \.txt); do
 
     PKGS=""
     PKGS+=" $(ls -1t $arch/kselftest/*v4.17*.txz | head -1)"
