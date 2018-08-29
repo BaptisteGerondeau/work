@@ -28,7 +28,7 @@ for arch in $(ls -1 | grep -v latest | grep -v all | grep -v shared | grep -v \.
     [ ! -f latest/$arch/README.txt ] && ln -s ../README.txt latest/$arch/README.txt
     [ ! -f latest/$arch/HEADER.txt ] && ln -s ../HEADER.txt latest/$arch/HEADER.txt
 
-    for pkg in $(ls $arch | grep -v kselftest); do
+    for pkg in $(ls $arch | grep -v kselftest | grep -v \.txt); do
 
         mkdir latest/$arch/$pkg
 
@@ -108,7 +108,7 @@ ln -s ../HEADER.txt all/HEADER.txt
 
 for arch in $(ls -1 | grep -v latest | grep -v all | grep -v shared | grep -v \.txt); do
 
-    for pkg in $(ls $arch); do
+    for pkg in $(ls -1 $arch | grep -v txt | xargs); do
 
         [ ! -d all/$pkg ] && mkdir all/$pkg
 
