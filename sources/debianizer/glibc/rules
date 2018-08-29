@@ -14,6 +14,9 @@ DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_HOST_ARCH_BITS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
 VERSION_UPSTREAM = $(shell echo '$(DEB_VERSION_UPSTREAM)')
 
+#CFLAGS="Wno-error" \
+#CC="/usr/bin/gcc-7 -Wno-error=date-time -Wno-error=maybe-uninitialized -Wno-error=format-overflow -Wno-error=nonnull -Wno-error=format-truncation -Wno-error=dangling-else" \
+
 %:
 	dh $@ --parallel --builddirectory=build/${DEB_HOST_MULTIARCH}
 
@@ -24,7 +27,6 @@ override_dh_update_autotools_config:
 
 override_dh_auto_configure:
 	dh_auto_configure --builddirectory=build/${DEB_HOST_MULTIARCH} -- \
-		CC="/usr/bin/gcc-7 -Wno-error=date-time -Wno-error=maybe-uninitialized -Wno-error=format-overflow -Wno-error=nonnull -Wno-error=format-truncation" \
 		--host=${DEB_HOST_GNU_TYPE} \
 		--build=${DEB_HOST_GNU_TYPE} \
 		--target=${DEB_HOST_GNU_TYPE} \
@@ -39,7 +41,7 @@ override_dh_auto_configure:
 		--disable-obsolete-rpc \
 		--disable-obsolete-nsl \
 		--disable-multi-arch \
-		--disable-werror \
+		--enable-werror=no \
 		--with-pkgversion="GLIBC 2.xx" \
 		--without-selinux
 
