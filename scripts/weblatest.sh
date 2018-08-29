@@ -106,7 +106,7 @@ rm -rf all/*
 ln -s ../README.txt all/README.txt
 ln -s ../HEADER.txt all/HEADER.txt
 
-for arch in $(ls -1 | grep -v latest | grep -v all | grep -v \.txt); do
+for arch in $(ls -1 | grep -v latest | grep -v all | grep -v shared | grep -v \.txt); do
 
     for pkg in $(ls $arch); do
 
