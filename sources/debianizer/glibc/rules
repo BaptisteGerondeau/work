@@ -24,7 +24,7 @@ override_dh_update_autotools_config:
 
 override_dh_auto_configure:
 	dh_auto_configure --builddirectory=build/${DEB_HOST_MULTIARCH} -- \
-		CC="/usr/bin/gcc-7 -Wno-error=date-time -Wno-error=maybe-uninitialized" \
+		CC="/usr/bin/gcc-7 -Wno-error=date-time -Wno-error=maybe-uninitialized -Wno-error=format-overflow -Wno-error=nonnull -Wno-error=format-truncation" \
 		--host=${DEB_HOST_GNU_TYPE} \
 		--build=${DEB_HOST_GNU_TYPE} \
 		--target=${DEB_HOST_GNU_TYPE} \
@@ -39,9 +39,9 @@ override_dh_auto_configure:
 		--disable-obsolete-rpc \
 		--disable-obsolete-nsl \
 		--disable-multi-arch \
-		--disable-werror
+		--disable-werror \
 		--with-pkgversion="GLIBC 2.xx" \
-		--without-selinux \
+		--without-selinux
 
 override_dh_auto_make:
 	dh_auto_make --builddirectory=build/${DEB_HOST_MULTIARCH} -- -prefix=/opt/libc6-preload
