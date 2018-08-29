@@ -10,6 +10,7 @@ CXXFLAGS=
 CFLAGS_NO_WERROR=yes
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_HOST_ARCH_BITS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_BITS)
 VERSION_UPSTREAM = $(shell echo '$(DEB_VERSION_UPSTREAM)')
 
@@ -23,9 +24,9 @@ override_dh_auto_configure:
 	dh_auto_configure --builddirectory=build/${DEB_HOST_MULTIARCH} -- \
 		CC="/usr/bin/gcc-7 -Wno-error=date-time -Wno-error=maybe-uninitialized" \
 		--prefix=/opt/libc6-preload \
-        --host=x86_64-linux-gnu \
-        --build=x86_64-linux-gnu \
-        --target=x86_64-linux-gnu \
+        --host=${DEB_HOST_GNU_TYPE} \
+        --build=${DEB_HOST_GNU_TYPE} \
+        --target=${DEB_HOST_GNU_TYPE} \
         --enable-checking=release \
 		--enable-languages=c,c++ \
 		--disable-multilib \
