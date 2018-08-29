@@ -20,28 +20,28 @@ VERSION_UPSTREAM = $(shell echo '$(DEB_VERSION_UPSTREAM)')
 override_dh_autoreconf:
 override_dh_update_autotools_config:
 
+# --enable-add-ons=libidn,"" \
+
 override_dh_auto_configure:
 	dh_auto_configure --builddirectory=build/${DEB_HOST_MULTIARCH} -- \
 		CC="/usr/bin/gcc-7 -Wno-error=date-time -Wno-error=maybe-uninitialized" \
+		--host=${DEB_HOST_GNU_TYPE} \
+		--build=${DEB_HOST_GNU_TYPE} \
+		--target=${DEB_HOST_GNU_TYPE} \
 		--prefix=/opt/libc6-preload \
-        --host=${DEB_HOST_GNU_TYPE} \
-        --build=${DEB_HOST_GNU_TYPE} \
-        --target=${DEB_HOST_GNU_TYPE} \
         --enable-checking=release \
 		--enable-languages=c,c++ \
-		--disable-multilib \
-		--prefix=/opt/libc6-preload \
-		--enable-add-ons=libidn,"" \
 		--enable-stackguard-randomization \
 		--enable-stack-protector=strong \
+		--enable-kernel=3.2
+		--enable-static-pie \
+		--disable-multilib \
 		--disable-obsolete-rpc \
 		--disable-obsolete-nsl \
-		--with-pkgversion="GLIBC 2.xx" \
-		--enable-kernel=3.2
-		--without-selinux \
 		--disable-multi-arch \
-		--enable-static-pie \
 		--disable-werror
+		--with-pkgversion="GLIBC 2.xx" \
+		--without-selinux \
 
 override_dh_auto_make:
 	dh_auto_make --builddirectory=build/${DEB_HOST_MULTIARCH} -- -prefix=/opt/libc6-preload
