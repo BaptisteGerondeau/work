@@ -27,6 +27,7 @@ override_dh_update_autotools_config:
 
 override_dh_auto_configure:
 	dh_auto_configure --builddirectory=build/${DEB_HOST_MULTIARCH} -- \
+		CC="gcc-7 -march=native" \
 		--host=${DEB_HOST_GNU_TYPE} \
 		--build=${DEB_HOST_GNU_TYPE} \
 		--target=${DEB_HOST_GNU_TYPE} \
