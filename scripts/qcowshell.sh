@@ -112,9 +112,9 @@ if   [ x$ARG0 == x"qcowshell.sh" ]; then
 elif [ x$ARG0 == x"qcowcmd.sh"  ]; then
 
     $SUDO -- lxc-start -n lxc$$
-    sleep 1
+    sleep 7
     $SUDO lxc-attach -n lxc$$ -- $ARGUMENT
-    sleep 1
+    sleep 3
     $SUDO -- lxc-stop -n lxc$$
 
 elif [ x$ARG0 == x"qcowhome.sh"  ]; then
