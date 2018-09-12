@@ -1,6 +1,6 @@
 #!/bin/bash
 
-URL="http://files.kernelpath.com:8080/latest/all"
+URL="http://files.kernelpath.com:8080/latest/"
 
 usage() {
     echo "usage:"
@@ -42,13 +42,13 @@ kver=$5
     [ "$kver" != "stable-4.17" ] && [ "$kver" != "stable-4.18" ] && \
     [ "$kver" != "mainline" ] && [ "$kver" != "next" ] && usage
 
-URL="$URL/$pkg"
+URL="$URL/$arch/$pkg"
 
 if [ "$pkg" != "kselftest" ]; then
 
     # all packages
 
-    PKG=$(w3m -dump $URL | grep "_$arch.$tipo " | awk '{print $1}' | sed 's: ::g')
+    PKG=$(w3m -dump $URL | grep ".$tipo " | awk '{print $1}' | sed 's: ::g')
 
     [ "$PKG" == "" ] && { echo "error: could not find package :\\"; exit 1; }
 
@@ -70,7 +70,7 @@ else
     [ "$kver" == "stable-4.14" ] && kverstr="v4\.14\."
     [ "$kver" == "stable-4.17" ] && kverstr="v4\.17\."
     [ "$kver" == "stable-4.18" ] && kverstr="v4\.18\."
-    [ "$kver" == "mainline" ] && kverstr="v4\.18-"
+    [ "$kver" == "mainline" ] && kverstr="v4\.19-"
     [ "$kver" == "next" ] && kverstr="-next-"
 
     PKG=$(w3m -dump $URL | awk '{print $1}' | grep $tipo | grep $arch | grep $kverstr)
