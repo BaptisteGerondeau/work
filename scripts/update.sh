@@ -66,7 +66,7 @@ cd $MAINDIR
 
 [ ! -d $FILEDIR ] && getout something went wrong
 
-DIRS=$(find . -maxdepth 4 -iregex .*/.git | sed 's:\./::g' | sed 's:/.git::g')
+DIRS=$(find . -maxdepth 4 -iregex .*/.git | grep -v mine | sed 's:\./::g' | sed 's:/.git::g')
 
 for dir in $DIRS; do
 
