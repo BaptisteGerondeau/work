@@ -26,7 +26,7 @@ fi
 
 # CHANGE HERE
 
-GCLEAN=0        # want to run git reset ? (default: 1)
+GCLEAN=1        # want to run git reset ? (default: 1)
 KCLEAN=1        # want to run make clean ? (default: 1)
 KCONFIG=1       # want to copy and process conf file ? (default: 1)
 KMCONFIG=0      # want a menu to add/remove stuff from .config ? (default: 0)
@@ -34,7 +34,7 @@ KLCONFIG=0      # want to merge a lsmod file into .config ? (default: 0)
 KPREPARE=1      # want to prepare ? (default: 1)
 KBUILD=1        # want to build ? :o) (default: 1)
 KDEBUG=0        # want your kernel to have debug symbols ? (default: 1)
-KVERBOSE=1      # want it to shut up ? (default: 1)
+KVERBOSE=0      # want it to shut up ? (default: 1)
 
 KRAMFS=1        # TARGET will be a KRAMFSSIZE GB tmpfs (default: 0)
 KRAMFSSIZE=12   # TARGET dir size in GB
@@ -97,7 +97,7 @@ lockdown() {
             break
         fi
 
-        echo "trying to acquire the lock"
+        echo "trying to acquire $LOCKFILE"
 
         # wait a bit for the lock
         # WARN: cron should not be less than 120 sec
@@ -219,7 +219,7 @@ fi
 
 if [ $DRAGON == 1 ]; then
     CONFIG=$DRAGONCONFIG
-    CONFIG=$DRAGONLCONFIG
+    LCONFIG=$DRAGONLCONFIG
 
     if [ "$TOARCH" != "arm64" ]; then
         getout "TOARCH: variable should be arm64 for dragonboard"
