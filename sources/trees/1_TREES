@@ -30,12 +30,15 @@ libhugetlbfs git@github.com:libhugetlbfs/libhugetlbfs.git
 libhugetlbfs-mine git@github.com:rafaeldtinoco/libhugetlbfs.git
 spectre-checker git@github.com:speed47/spectre-meltdown-checker.git
 lkft-tools https://github.com/Linaro/lkft-tools.git
+lkft-tools-mine git@github.com:rafaeldtinoco/lkft-tools.git
 lkft-website git@github.com:rafaeldtinoco/lkft-website.git
 lkft-website-mine git@github.com:rafaeldtinoco/lkft-website.git
 ltp git@github.com:linux-test-project/ltp.git
 ltp-mine git@github.com:rafaeldtinoco/ltp.git
 ltp-android https://android.googlesource.com/platform/external/ltp
+meta-96boards https://github.com/96boards/meta-96boards.git
 meta-96boards-mine git@github.com:rafaeldtinoco/meta-96boards.git
 random-mine git@github.com:rafaeldtinoco/random.git
 scripts-mine git@github.com:rafaeldtinoco/scripts.git
-lkft-tools-mine git@github.com:rafaeldtinoco/lkft-tools.git
+meta-rpb https://github.com/96boards/meta-rpb.git
+meta-rpb-mine https://github.com/96boards/meta-rpb.git
