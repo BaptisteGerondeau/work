@@ -17,7 +17,7 @@ NCPU=$(($NUMCPU - 1))
 #NCPU=1
 
 MYARCH="amd64"  # (amd64|x86|arm64|armhf|armel)
-TOARCH="amd64"  # (amd64|x86|arm64|armhf|armel)
+TOARCH="armhf"  # (amd64|x86|arm64|armhf|armel)
 
 KCROSS=0        # are you cross compiling ? (automatic)
 if [ "$MYARCH" != "$TOARCH" ]; then
@@ -26,19 +26,19 @@ fi
 
 # CHANGE HERE
 
-GCLEAN=1        # want to run git reset ? (default: 1)
-KCLEAN=1        # want to run make clean ? (default: 1)
-KCONFIG=1       # want to copy and process conf file ? (default: 1)
+GCLEAN=0        # want to run git reset ? (default: 1)
+KCLEAN=0        # want to run make clean ? (default: 1)
+KCONFIG=0       # want to copy and process conf file ? (default: 1)
 KMCONFIG=0      # want a menu to add/remove stuff from .config ? (default: 0)
 KLCONFIG=0      # want to merge a lsmod file into .config ? (default: 0)
-KPREPARE=1      # want to prepare ? (default: 1)
+KPREPARE=0      # want to prepare ? (default: 1)
 KBUILD=1        # want to build ? :o) (default: 1)
-KDEBUG=0        # want your kernel to have debug symbols ? (default: 1)
+KDEBUG=1        # want your kernel to have debug symbols ? (default: 1)
 KVERBOSE=0      # want it to shut up ? (default: 1)
 
-KRAMFS=1        # TARGET will be a KRAMFSSIZE GB tmpfs (default: 0)
-KRAMFSSIZE=12   # TARGET dir size in GB
-KRAMFSUMNT=1    # TARGET will be unmounted (default: 0)
+KRAMFS=0        # TARGET will be a KRAMFSSIZE GB tmpfs (default: 0)
+KRAMFSSIZE=15   # TARGET dir size in GB
+KRAMFSUMNT=0    # TARGET will be unmounted (default: 0)
 
 # STOP CHANGING
 
@@ -56,7 +56,7 @@ AMD64CONFIG="$FILEDIR/config-amd64"
 
 DRAGON=0        # dragon board config file (default: 0)
 HIKEY=0         # hikey board config file (default: 0)
-BEAGLE=0        # beable board config file (default: 0)
+BEAGLE=1        # beable board config file (default: 0)
 OTHER=0         # some other config file (default: 0)
 
 DRAGONCONFIG="$FILEDIR/config-dragon"

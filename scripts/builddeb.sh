@@ -49,8 +49,8 @@ cleanoutlockup() {
 
 gitcleanup() {
     cd $MAINDIR
-    git reset --hard
-    git clean -fd
+    #git reset --hard
+    #git clean -fd
     cat debian/changelog.initial > debian/changelog
 }
 
