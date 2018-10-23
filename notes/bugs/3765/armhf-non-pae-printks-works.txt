@@ -39,7 +39,7 @@ Writing superblocks and filesystem accounting information:
 [  156.313617] mm/zsmalloc.c:900:page ptr:4025155872
 [  156.315930] mm/zsmalloc.c:901:obj_idx:0
 [  156.317840] mm/zsmalloc.c:903:obj:0
-[  156.319578] mm/zsmalloc.c:904:page ptr:4025155872
+[  156.319578] mm/zsmalloc.c:904:page ptr:4025155872		- 2061256704 << 11, PFN = 1006473 (or 0xF5B89)
 [  156.321751] mm/zsmalloc.c:905:OBJ_INDEX_BITS:11
 [  156.324113] mm/zsmalloc.c:907:obj:2061256704
 [  156.326220] mm/zsmalloc.c:909:obj:2061256704
