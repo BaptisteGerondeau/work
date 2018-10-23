@@ -1,0 +1,145 @@
+inaddy@bug3765:~$ sudo modprobe zram
+[   41.602746] zram: Added device: zram0
+
+inaddy@bug3765:~$ echo 1048576 | sudo tee /sys/devices/virtual/block/zram0/disksize
+1048576
+
+[   43.187463] zram0: detected capacity change from 0 to 1048576
+
+inaddy@bug3765:~$ sudo mkfs.ext4 /dev/zram0 
+mke2fs 1.44.4 (18-Aug-2018)
+Filesystem too small for a journal
+Creating filesystem with 256 4k blocks and 128 inodes
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Writing superblocks and filesystem accounting information: 
+
+[   50.621966] mm/zsmalloc.c:1525:handle:3949629440			- 0xEB6A9000			HANDLE = slab zs_pool->handle_cachep (zs_handle)
+[   50.624220] mm/zsmalloc.c:1526:size:89 				- 0x59	(89)			SIZE (size argument, space asked for zsmalloc)
+
+[   50.626336] mm/zsmalloc.c:1532:size:93				- 0x5D	(93)			SIZE (size + zs_handle size (4))
+[   50.628154] mm/zsmalloc.c:1533:size_class->size:96 			- 0x60 	(96)			SIZE_CLASS->SIZE (pool->size_class[index for size])
+[   50.630505] mm/zsmalloc.c:1534:size_class->objs_per_zspage:128 	- 0x80 	(128)			SIZE_CLASS->OBJS_PER_ZSPAGE
+[   50.633394] mm/zsmalloc.c:1535:size_class->pages_per_zspage:3 	- 0x3 				SIZE_CLASS->PAGES_PER_ZSPAGE
+
+[   50.636469] mm/zsmalloc.c:1557:zspage ptr:3926020096			- 0xEA025000
+[   50.638917] mm/zsmalloc.c:1558:zspage->fullness:0 			- 0x0 				ZSPAGE->FULLNESS (still zeroed)
+[   50.641263] mm/zsmalloc.c:1559:zspage->class:0 			- 0x0 				ZSPAGE->CLASS (still zeroed)
+[   50.643424] mm/zsmalloc.c:1560:zspage->isolated:0 			- 0x0 				ZSPAGE->ISOLATED (still zeroed)
+[   50.645929] mm/zsmalloc.c:1561:zspage->magic:88			- 0x58 (88)			ZSPAGE->MAGIC (calculated on alloc_zspage())
+[   50.648184] mm/zsmalloc.c:1562:zspage->inuse:0			- 0x0 				ZSPAGE->INUSE (still zeroed)
+[   50.650337] mm/zsmalloc.c:1563:zspage->freeobj:0			- 0x0 				ZSPAGE->FREEOBJ (still zeroed)
+
+	obj = obj_malloc(class, zspage, handle);
+
+[   50.652605] mm/zsmalloc.c:1448:zspage ptr:3926020096			- 0xEA025000			ZSPAGE PTR (given arg, ptr)
+[   50.655005] mm/zsmalloc.c:1449:handle:3949629440 			- 0xEB6A9000			HANDLE (given arg, handle id)
+	
+	handle |= OBJ_ALLOCATED_TAG;
+	obj = get_freeobj(zspage);
+
+[   50.657676] mm/zsmalloc.c:1454:handle:3949629441			- 0xEB6A9001		 	HANDLE (handle | OBJ_ALLOCATED_TAG == 1)
+[   50.659935] mm/zsmalloc.c:1455:obj:0					- 0x0 	 			OBJ (zspage->freeobj)
+
+	offset = obj * class->size; 					- 0x0 * 0x93 = 0x0
+	nr_page = offset >> PAGE_SHIFT; 				- 0 >> 12 = 0
+	m_offset = offset & ~PAGE_MASK; 				- 0 & ~(((1UL) << 12)-1) = 0
+	m_page = get_first_page(zspage); 				- struct zspage->first-page 
+
+[   50.661717] mm/zsmalloc.c:1462:offset:0				- 0x0 				OFFSET
+[   50.663635] mm/zsmalloc.c:1463:nr_page:0				- 0x0 				NR_PAGE
+[   50.665672] mm/zsmalloc.c:1464:m_offset:0				- 0x0 				M_OFFSET
+[   50.667641] mm/zsmalloc.c:1465:m_page:4025863904			- 0xEFF5CEE0			M_PAGE (alloc_page() from alloc_zspage->create_page-chain())
+
+	for (i = 0; i < nr_page; i++)					- nr_page == 0
+		m_page = get_next_page(m_page);
+
+[   50.669880] mm/zsmalloc.c:1470:m_page:4025863904			- 0xEFF5CEE0			M_PAGE (still first_page, no loop)
+
+	vaddr = kmap_atomic(m_page);
+
+[   50.672143] mm/zsmalloc.c:1474:vaddr ptr:4293910528			- 0xFFEFE000			VADDR (page address from kmap_atomic())
+
+	link = (struct link_free *)vaddr + m_offset / sizeof(*link);
+
+[   50.674511] mm/zsmalloc.c:1478:link ptr:4293910528			- 0xFFEFE000			LINK == VADDR (since m_offset is 0)
+
+	obj = location_to_obj(m_page, obj);								M_PAGE == 4025863904 == 0xEFF5CEE0 (from alloc_page()...)
+
+	[   50.677108] mm/zsmalloc.c:881:obj_idx:0			- 0x0 				OBJ_IDX (arg given = zspage->freeobj == 0)
+	[   50.679015] mm/zsmalloc.c:882:obj:0				- 0x0 				OBJ (arg declared)
+
+		obj = page_to_pfn(page) << OBJ_INDEX_BITS;		- PAGE_TO_PFN << 7 
+		       (BITS_PER_LONG - _PFN_BITS - OBJ_TAG_BITS)         				PAGE_TO_PFN == ??? << 7
+                            32 - 24 - 1 = 7
+
+	[   50.680728] mm/zsmalloc.c:885:obj:3717183488			- 0xDD8FB800			OBJ == 0xDD989000
+
+		obj |= obj_idx & OBJ_INDEX_MASK;
+
+	[   50.682846] mm/zsmalloc.c:887:obj:3717183488			- 0xDD8FB800			OBJ == 0xDD989000
+		
+		obj <<= OBJ_TAG_BITS;
+
+	[   50.684913] mm/zsmalloc.c:889:obj:3139399680			- 0xBB1F7000			OBJ == 3140558848 == 0xBB1F7000 (RETURNED)
+
+[   50.687366] mm/zsmalloc.c:1494:m_page:4025863904			- 0xEFF5CEE0 			M_PAGE (alloc_page() from alloc_zspage->... zspage->first_page)
+[   50.689649] mm/zsmalloc.c:1495:obj:3139399680			- 0xBB1F7000			OBJ == 3139399680 == 0xBB1F7000 (RETURNED FROM location_to_obj())
+
+	return obj;
+
+[   50.691766] mm/zsmalloc.c:1567:obj:3139399680			- 0xBB1F7000			OBJ (RETURNED FROM OBJ_MALLOC)
+
+	newfg = get_fullness_group(class, zspage);			- ZS_ALMOST_EMPTY
+
+[   50.693828] mm/zsmalloc.c:1569:newfg:1 				- 0x1 				NEWFG
+
+	insert_zspage(class, zspage, newfg);
+	set_zspage_mapping(zspage, class->index, newfg);
+	
+	record_obj(handle, obj);					- HANDLE == 0xEA280000
+		== WRITE_ONCE(*(unsigned long *)handle, obj);		- OBJ == 0xBB1F7000
+
+[   50.695743] mm/zsmalloc.c:1573:handle:3949629440			- 0xEB6A9000			HANDLE
+[   50.698025] mm/zsmalloc.c:1574:obj:3139399680			- 0xBB1F7000  			OBJ
+
+	return handle;
+
+[   50.702398] drivers/block/zram/zram_drv.c:1162:handle:3949629440	- 0xEB6A9000			HANDLE (RETURNED FROM zs_malloc() to __zram_bvec_write())
+	...
+[   50.705248] drivers/block/zram/zram_drv.c:1167:alloced_pages:3 	- 0x3 				ALLOCED_PAGES
+
+	__zram_bvec_write() calls zs_map_object():
+
+	pin_tag(handle); 										WTF ?! did this change OBJ from 0xBB1F7000 to 0xBB1F7001 ?
+			*(unsigned long 0)handle (bit 0) changed
+
+	[   50.708492] mm/zsmalloc.c:1340:handle:3949629440		- 0xEB6A9000			HANDLE (ptr to OBJ)
+
+		obj = handle_to_obj(handle);
+			*(unsigned long *)handle;							*** WRONG because pin_tag changed bit 0 of OBJ ***
+
+	[   50.710712] mm/zsmalloc.c:1343:obj:3139399681		- 0xBB1F7001			WRONG (should be 0xBB1F7000)
+
+		obj_to_location(obj, &page, &obj_idx);
+
+		[   50.712778] mm/zsmalloc.c:863:obj:3139399681		- 0xBB1F7001			WRONG (arg "obj" given)
+
+		obj >>= OBJ_TAG_BITS;
+			obj = 0xBB1F7001 >> 1								IF I shift this bit (lock) back, I fix the issue =)
+													ALL this because, literally, 1 bit .... =\
+
+		[   50.717245] mm/zsmalloc.c:866:obj:1569699840 	- 0x5D8FB800			obj trashed() because it should be 0xBB1F7000		
+		[   50.719329] mm/zsmalloc.c:869:obj_idx:0		- 0x0 				OBJ_IDX is 0 (correct)
+
+	[   50.721072] mm/zsmalloc.c:1346:page ptr:3992309472		- 0xEDF5CEE0			WRONG (should be 0xEA025000)
+
+
+[   50.723344] Unable to handle kernel NULL pointer dereference at virtual address 00000000
+[   50.727504] pgd = (ptrval)
+[   50.728881] [00000000] *pgd=6a70f003, *pmd=00000000
+[   50.731297] Internal error: Oops: 206 [#1] SMP ARM
+[   50.733572] Modules linked in: zram sha2_arm_ce sha256_arm sha1_arm_ce sha1_arm aes_arm_ce crypto_simd cryptd crc32_arm_ce
+[   50.739435] CPU: 0 PID: 707 Comm: mkfs.ext4 Not tainted 4.19.0-rc8-00016-gc343db455eb3-dirty #21
+[   50.744299] Hardware name: Generic DT based system

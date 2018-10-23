@@ -1,0 +1,107 @@
+## ARMHF (without PAE)
+
+inaddy@bug3765:~$ sudo mkfs.ext4 /dev/zram0 
+mke2fs 1.44.4 (18-Aug-2018)
+
+Filesystem too small for a journal
+Creating filesystem with 256 4k blocks and 128 inodes
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Writing superblocks and filesystem accounting information: 
+[  156.253630] zs_malloc() enter
+[  156.255208] mm/zsmalloc.c:1580:handle:3955642368
+[  156.257489] mm/zsmalloc.c:1581:size:89
+[  156.259369] mm/zsmalloc.c:1587:size:93
+[  156.261259] mm/zsmalloc.c:1588:size_class->size:96
+[  156.263769] mm/zsmalloc.c:1589:size_class->objs_per_zspage:128
+[  156.266675] mm/zsmalloc.c:1590:size_class->pages_per_zspage:3
+[  156.269496] mm/zsmalloc.c:1612:zspage ptr:3956408320
+[  156.271915] mm/zsmalloc.c:1614:zspage->fullness:0
+[  156.274459] mm/zsmalloc.c:1615:zspage->class:0
+[  156.276659] mm/zsmalloc.c:1616:zspage->isolated:0
+[  156.278991] mm/zsmalloc.c:1617:zspage->magic:88
+[  156.281211] mm/zsmalloc.c:1618:zspage->inuse:0
+[  156.283495] mm/zsmalloc.c:1619:zspage->freeobj:0
+[  156.285793] obj_malloc() enter
+[  156.285801] mm/zsmalloc.c:1499:zspage ptr:3956408320
+[  156.289758] mm/zsmalloc.c:1500:handle:3955642368
+[  156.292052] mm/zsmalloc.c:1505:handle:3955642369
+[  156.294540] mm/zsmalloc.c:1506:obj:0
+[  156.296324] mm/zsmalloc.c:1513:offset:0
+[  156.298230] mm/zsmalloc.c:1514:nr_page:0
+[  156.300208] mm/zsmalloc.c:1515:m_offset:0
+[  156.302215] mm/zsmalloc.c:1516:m_page:4025155872
+[  156.304769] mm/zsmalloc.c:1521:m_page:4025155872
+[  156.307051] mm/zsmalloc.c:1525:vaddr ptr:4293713920
+[  156.309459] mm/zsmalloc.c:1529:link ptr:4293713920
+[  156.311824] location_to_obj() enter
+[  156.313617] mm/zsmalloc.c:900:page ptr:4025155872
+[  156.315930] mm/zsmalloc.c:901:obj_idx:0
+[  156.317840] mm/zsmalloc.c:903:obj:0
+[  156.319578] mm/zsmalloc.c:904:page ptr:4025155872
+[  156.321751] mm/zsmalloc.c:905:OBJ_INDEX_BITS:11
+[  156.324113] mm/zsmalloc.c:907:obj:2061256704
+[  156.326220] mm/zsmalloc.c:909:obj:2061256704
+[  156.328362] mm/zsmalloc.c:910:obj_idx:0
+[  156.330260] mm/zsmalloc.c:911:OBJ_INDEX_MASK:2047
+[  156.332572] mm/zsmalloc.c:913:obj:2061256704
+[  156.335013] mm/zsmalloc.c:915:obj:2061256704
+[  156.337150] mm/zsmalloc.c:916:OBJ_TAG_BITS:1
+[  156.339251] mm/zsmalloc.c:918:obj:4122513408
+[  156.341292] location_to_obj() exit
+[  156.343016] mm/zsmalloc.c:1545:m_page:4025155872
+[  156.345670] mm/zsmalloc.c:1546:obj:4122513408
+[  156.347802] obj_malloc() exit
+[  156.347810] mm/zsmalloc.c:1623:obj:4122513408
+[  156.351414] mm/zsmalloc.c:1625:newfg:1
+[  156.353240] mm/zsmalloc.c:1629:handle:3955642368
+[  156.355902] mm/zsmalloc.c:1630:obj:4122513408
+[  156.358070] mm/zsmalloc.c:1639:handle:3955642368
+[  156.360357] zs_malloc() exit
+[  156.361803] drivers/block/zram/zram_drv.c:1162:handle:3955642368
+[  156.364938] drivers/block/zram/zram_drv.c:1167:alloced_pages:3
+[  156.367817] zs_map_object() enter
+[  156.367825] mm/zsmalloc.c:1378:handle:3955642368
+[  156.371721] pin_tag() enter
+[  156.373116] mm/zsmalloc.c:953:handle pointing to obj:3955642368
+[  156.376535] mm/zsmalloc.c:957:handle pointing to obj:3955642368
+[  156.379526] pin_tag() exit
+[  156.380896] mm/zsmalloc.c:1384:handle:3955642368
+[  156.383159] mm/zsmalloc.c:1389:handle:3955642368
+[  156.385723] mm/zsmalloc.c:1390:obj:4122513409
+[  156.387871] obj_to_location() enter
+[  156.389613] mm/zsmalloc.c:865:obj:4122513409
+[  156.391767] mm/zsmalloc.c:866:page ptr:3954915960
+[  156.394130] mm/zsmalloc.c:867:obj_idx:3225210520
+[  156.396456] mm/zsmalloc.c:869:obj:4122513409
+[  156.398574] mm/zsmalloc.c:870:OBJ_TAG_BITS:1
+[  156.400707] mm/zsmalloc.c:872:obj:2061256704
+[  156.402863] mm/zsmalloc.c:874:page ptr:3954915960
+[  156.405522] mm/zsmalloc.c:875:obj:2061256704
+[  156.407617] mm/zsmalloc.c:876:OBJ_INDEX_BITS:11
+[  156.409802] mm/zsmalloc.c:878:page ptr:4025155872
+[  156.412188] mm/zsmalloc.c:880:obj_idx:3225210520
+[  156.414674] mm/zsmalloc.c:881:obj:2061256704
+[  156.416778] mm/zsmalloc.c:882:OBJ_INDEX_MASK:2047
+[  156.419133] mm/zsmalloc.c:884:obj_idx:0
+[  156.420985] obj_to_location() exit
+[  156.422645] mm/zsmalloc.c:1393:page ptr:4025155872
+[  156.425221] mm/zsmalloc.c:1395:zpage ptr:3956408320
+[  156.427637] zs_map_object() exit
+[  156.427644] obj_to_location() enter
+[  156.431043] mm/zsmalloc.c:865:obj:4122513409
+[  156.433162] mm/zsmalloc.c:866:page ptr:4025155872
+[  156.436188] mm/zsmalloc.c:867:obj_idx:0
+[  156.438094] mm/zsmalloc.c:869:obj:4122513409
+[  156.440272] mm/zsmalloc.c:870:OBJ_TAG_BITS:1
+[  156.442375] mm/zsmalloc.c:872:obj:2061256704
+[  156.444847] mm/zsmalloc.c:874:page ptr:4025155872
+[  156.447205] mm/zsmalloc.c:875:obj:2061256704
+[  156.449294] mm/zsmalloc.c:876:OBJ_INDEX_BITS:11
+[  156.451463] mm/zsmalloc.c:878:page ptr:4025155872
+[  156.453912] mm/zsmalloc.c:880:obj_idx:0
+[  156.455811] mm/zsmalloc.c:881:obj:2061256704
+[  156.457879] mm/zsmalloc.c:882:OBJ_INDEX_MASK:2047
+[  156.460179] mm/zsmalloc.c:884:obj_idx:0
+[  156.462071] obj_to_location() exit
