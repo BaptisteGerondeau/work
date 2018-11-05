@@ -23,6 +23,7 @@ Writing superblocks and filesystem accounting information:
 [  156.278991] mm/zsmalloc.c:1617:zspage->magic:88
 [  156.281211] mm/zsmalloc.c:1618:zspage->inuse:0
 [  156.283495] mm/zsmalloc.c:1619:zspage->freeobj:0
+
 [  156.285793] obj_malloc() enter
 [  156.285801] mm/zsmalloc.c:1499:zspage ptr:3956408320
 [  156.289758] mm/zsmalloc.c:1500:handle:3955642368
@@ -35,6 +36,7 @@ Writing superblocks and filesystem accounting information:
 [  156.304769] mm/zsmalloc.c:1521:m_page:4025155872
 [  156.307051] mm/zsmalloc.c:1525:vaddr ptr:4293713920
 [  156.309459] mm/zsmalloc.c:1529:link ptr:4293713920
+
 [  156.311824] location_to_obj() enter
 [  156.313617] mm/zsmalloc.c:900:page ptr:4025155872
 [  156.315930] mm/zsmalloc.c:901:obj_idx:0
@@ -50,6 +52,7 @@ Writing superblocks and filesystem accounting information:
 [  156.337150] mm/zsmalloc.c:916:OBJ_TAG_BITS:1
 [  156.339251] mm/zsmalloc.c:918:obj:4122513408
 [  156.341292] location_to_obj() exit
+
 [  156.343016] mm/zsmalloc.c:1545:m_page:4025155872
 [  156.345670] mm/zsmalloc.c:1546:obj:4122513408
 [  156.347802] obj_malloc() exit
