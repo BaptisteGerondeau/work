@@ -1,0 +1,269 @@
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index a1d6b5597c17..7d1a0bc0dec4 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1159,9 +1159,13 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
+ 		return -ENOMEM;
+ 	}
+ 
++	printk(KERN_INFO "%s:%d:handle:%lu\n", __FILE__, __LINE__, handle);
++
+ 	alloced_pages = zs_get_total_pages(zram->mem_pool);
+ 	update_used_max(zram, alloced_pages);
+ 
++	printk(KERN_INFO "%s:%d:alloced_pages:%lu\n", __FILE__, __LINE__, alloced_pages);
++
+ 	if (zram->limit_pages && alloced_pages > zram->limit_pages) {
+ 		zcomp_stream_put(zram->comp);
+ 		zs_free(zram->mem_pool, handle);
+diff --git a/mm/zsmalloc.c b/mm/zsmalloc.c
+index 9da65552e7ca..9e72dcd2f97c 100644
+--- a/mm/zsmalloc.c
++++ b/mm/zsmalloc.c
+@@ -321,12 +321,12 @@ static void SetZsPageMovable(struct zs_pool *pool, struct zspage *zspage) {}
+ static int create_cache(struct zs_pool *pool)
+ {
+ 	pool->handle_cachep = kmem_cache_create("zs_handle", ZS_HANDLE_SIZE,
+-					0, 0, NULL);
++					0, SLAB_POISON, NULL);
+ 	if (!pool->handle_cachep)
+ 		return 1;
+ 
+ 	pool->zspage_cachep = kmem_cache_create("zspage", sizeof(struct zspage),
+-					0, 0, NULL);
++					0, SLAB_POISON, NULL);
+ 	if (!pool->zspage_cachep) {
+ 		kmem_cache_destroy(pool->handle_cachep);
+ 		pool->handle_cachep = NULL;
+@@ -859,9 +859,31 @@ static struct page *get_next_page(struct page *page)
+ static void obj_to_location(unsigned long obj, struct page **page,
+ 				unsigned int *obj_idx)
+ {
++
++	printk(KERN_INFO "obj_to_location() enter\n");
++
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++	printk(KERN_INFO "%s:%d:page ptr:%lu\n", __FILE__, __LINE__, (ulong) *page);
++	printk(KERN_INFO "%s:%d:obj_idx:%u\n", __FILE__, __LINE__, *obj_idx);
++
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++	printk(KERN_INFO "%s:%d:OBJ_TAG_BITS:%d\n", __FILE__, __LINE__, OBJ_TAG_BITS);
+ 	obj >>= OBJ_TAG_BITS;
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++
++	printk(KERN_INFO "%s:%d:page ptr:%lu\n", __FILE__, __LINE__, (ulong) *page);
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++	printk(KERN_INFO "%s:%d:OBJ_INDEX_BITS:%d\n", __FILE__, __LINE__, OBJ_INDEX_BITS);
+ 	*page = pfn_to_page(obj >> OBJ_INDEX_BITS);
++	printk(KERN_INFO "%s:%d:page ptr:%lu\n", __FILE__, __LINE__, (ulong) *page);
++
++	printk(KERN_INFO "%s:%d:obj_idx:%u\n", __FILE__, __LINE__, *obj_idx);
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++	printk(KERN_INFO "%s:%d:OBJ_INDEX_MASK:%lu\n", __FILE__, __LINE__, OBJ_INDEX_MASK);
+ 	*obj_idx = (obj & OBJ_INDEX_MASK);
++	printk(KERN_INFO "%s:%d:obj_idx:%u\n", __FILE__, __LINE__, *obj_idx);
++
++	printk(KERN_INFO "obj_to_location() exit\n");
+ }
+ 
+ /**
+@@ -873,9 +895,29 @@ static unsigned long location_to_obj(struct page *page, unsigned int obj_idx)
+ {
+ 	unsigned long obj;
+ 
++	printk(KERN_INFO "location_to_obj() enter\n");
++
++	printk(KERN_INFO "%s:%d:page ptr:%lu\n", __FILE__, __LINE__, (ulong) page);
++	printk(KERN_INFO "%s:%d:obj_idx:%u\n", __FILE__, __LINE__, obj_idx);
++
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++	printk(KERN_INFO "%s:%d:page ptr:%lu\n", __FILE__, __LINE__, (ulong) page);
++	printk(KERN_INFO "%s:%d:OBJ_INDEX_BITS:%d\n", __FILE__, __LINE__, OBJ_INDEX_BITS);
+ 	obj = page_to_pfn(page) << OBJ_INDEX_BITS;
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++	printk(KERN_INFO "%s:%d:obj_idx:%u\n", __FILE__, __LINE__, obj_idx);
++	printk(KERN_INFO "%s:%d:OBJ_INDEX_MASK:%lu\n", __FILE__, __LINE__, OBJ_INDEX_MASK);
+ 	obj |= obj_idx & OBJ_INDEX_MASK;
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++	printk(KERN_INFO "%s:%d:OBJ_TAG_BITS:%d\n", __FILE__, __LINE__, OBJ_TAG_BITS);
+ 	obj <<= OBJ_TAG_BITS;
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++
++	printk(KERN_INFO "location_to_obj() exit\n");
+ 
+ 	return obj;
+ }
+@@ -906,7 +948,15 @@ static inline int trypin_tag(unsigned long handle)
+ 
+ static void pin_tag(unsigned long handle)
+ {
++	printk(KERN_INFO "pin_tag() enter\n");
++
++	printk(KERN_INFO "%s:%d:handle pointing to obj:%lu\n", __FILE__, __LINE__, (ulong *) handle);
++
+ 	bit_spin_lock(HANDLE_PIN_BIT, (unsigned long *)handle);
++
++	printk(KERN_INFO "%s:%d:handle pointing to obj:%lu\n", __FILE__, __LINE__, (ulong *) handle);
++
++	printk(KERN_INFO "pin_tag() exit\n");
+ }
+ 
+ static void unpin_tag(unsigned long handle)
+@@ -1316,6 +1366,8 @@ void *zs_map_object(struct zs_pool *pool, unsigned long handle,
+ 	struct page *pages[2];
+ 	void *ret;
+ 
++	printk(KERN_INFO "zs_map_object() enter");
++
+ 	/*
+ 	 * Because we use per-cpu mapping areas shared among the
+ 	 * pools/users, we can't allow mapping in interrupt context
+@@ -1323,12 +1375,24 @@ void *zs_map_object(struct zs_pool *pool, unsigned long handle,
+ 	 */
+ 	BUG_ON(in_interrupt());
+ 
++	printk(KERN_INFO "%s:%d:handle:%lu\n", __FILE__, __LINE__, handle);
++	//printk(KERN_INFO "%s:%d:handle poiting to obj:%lu\n", __FILE__, __LINE__, *handle);
++
+ 	/* From now on, migration cannot move the object */
+ 	pin_tag(handle);
+ 
++	printk(KERN_INFO "%s:%d:handle:%lu\n", __FILE__, __LINE__, handle);
++	//printk(KERN_INFO "%s:%d:handle poiting to obj:%lu\n", __FILE__, __LINE__, *handle);
++
+ 	obj = handle_to_obj(handle);
++
++	printk(KERN_INFO "%s:%d:handle:%lu\n", __FILE__, __LINE__, handle);
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++
+ 	obj_to_location(obj, &page, &obj_idx);
++	printk(KERN_INFO "%s:%d:page ptr:%lu\n", __FILE__, __LINE__, (ulong) page);
+ 	zspage = get_zspage(page);
++	printk(KERN_INFO "%s:%d:zpage ptr:%lu\n", __FILE__, __LINE__, (ulong) zspage);
+ 
+ 	/* migration cannot move any subpage in this zspage */
+ 	migrate_read_lock(zspage);
+@@ -1356,6 +1420,8 @@ void *zs_map_object(struct zs_pool *pool, unsigned long handle,
+ 	if (likely(!PageHugeObject(page)))
+ 		ret += ZS_HANDLE_SIZE;
+ 
++	printk(KERN_INFO "zs_map_object() exit");
++
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(zs_map_object);
+@@ -1428,19 +1494,40 @@ static unsigned long obj_malloc(struct size_class *class,
+ 	unsigned long m_offset;
+ 	void *vaddr;
+ 
++	printk(KERN_INFO "obj_malloc() enter");
++
++	printk(KERN_INFO "%s:%d:zspage ptr:%lu\n", __FILE__, __LINE__, (ulong) zspage);
++	printk(KERN_INFO "%s:%d:handle:%lu\n", __FILE__, __LINE__, handle);
++
+ 	handle |= OBJ_ALLOCATED_TAG;
+ 	obj = get_freeobj(zspage);
+ 
++	printk(KERN_INFO "%s:%d:handle:%lu\n", __FILE__, __LINE__, handle);
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++
+ 	offset = obj * class->size;
+ 	nr_page = offset >> PAGE_SHIFT;
+ 	m_offset = offset & ~PAGE_MASK;
+ 	m_page = get_first_page(zspage);
+ 
++	printk(KERN_INFO "%s:%d:offset:%d\n", __FILE__, __LINE__, offset);
++	printk(KERN_INFO "%s:%d:nr_page:%d\n", __FILE__, __LINE__, nr_page);
++	printk(KERN_INFO "%s:%d:m_offset:%lu\n", __FILE__, __LINE__, m_offset);
++	printk(KERN_INFO "%s:%d:m_page:%lu\n", __FILE__, __LINE__, (ulong) m_page);
++
+ 	for (i = 0; i < nr_page; i++)
+ 		m_page = get_next_page(m_page);
+ 
++	printk(KERN_INFO "%s:%d:m_page:%lu\n", __FILE__, __LINE__, (ulong) m_page);
++
+ 	vaddr = kmap_atomic(m_page);
++
++	printk(KERN_INFO "%s:%d:vaddr ptr:%lu\n", __FILE__, __LINE__, (ulong) vaddr);
++
+ 	link = (struct link_free *)vaddr + m_offset / sizeof(*link);
++
++	printk(KERN_INFO "%s:%d:link ptr:%lu\n", __FILE__, __LINE__, (ulong) link);
++
+ 	set_freeobj(zspage, link->next >> OBJ_TAG_BITS);
+ 	if (likely(!PageHugeObject(m_page)))
+ 		/* record handle in the header of allocated chunk */
+@@ -1455,6 +1542,11 @@ static unsigned long obj_malloc(struct size_class *class,
+ 
+ 	obj = location_to_obj(m_page, obj);
+ 
++	printk(KERN_INFO "%s:%d:m_page:%lu\n", __FILE__, __LINE__, (ulong) m_page);
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
++
++	printk(KERN_INFO "obj_malloc() exit");
++
+ 	return obj;
+ }
+ 
+@@ -1483,10 +1575,20 @@ unsigned long zs_malloc(struct zs_pool *pool, size_t size, gfp_t gfp)
+ 	if (!handle)
+ 		return 0;
+ 
++	printk(KERN_INFO "zs_malloc() enter\n");
++
++	printk(KERN_INFO "%s:%d:handle:%lu\n", __FILE__, __LINE__, handle);
++	printk(KERN_INFO "%s:%d:size:%u\n", __FILE__, __LINE__, size);
++
+ 	/* extra space in chunk to keep the handle */
+ 	size += ZS_HANDLE_SIZE;
+ 	class = pool->size_class[get_size_class_index(size)];
+ 
++	printk(KERN_INFO "%s:%d:size:%u\n", __FILE__, __LINE__, size);
++	printk(KERN_INFO "%s:%d:size_class->size:%d\n", __FILE__, __LINE__, class->size);
++	printk(KERN_INFO "%s:%d:size_class->objs_per_zspage:%d\n", __FILE__, __LINE__, class->objs_per_zspage);
++	printk(KERN_INFO "%s:%d:size_class->pages_per_zspage:%d\n", __FILE__, __LINE__, class->pages_per_zspage);
++
+ 	spin_lock(&class->lock);
+ 	zspage = find_get_zspage(class);
+ 	if (likely(zspage)) {
+@@ -1507,12 +1609,25 @@ unsigned long zs_malloc(struct zs_pool *pool, size_t size, gfp_t gfp)
+ 		return 0;
+ 	}
+ 
++	printk(KERN_INFO "%s:%d:zspage ptr:%lu\n", __FILE__, __LINE__, (ulong) zspage);
++
++	printk(KERN_INFO "%s:%d:zspage->fullness:%d\n", __FILE__, __LINE__, zspage->fullness);
++	printk(KERN_INFO "%s:%d:zspage->class:%d\n", __FILE__, __LINE__, zspage->class);
++	printk(KERN_INFO "%s:%d:zspage->isolated:%d\n", __FILE__, __LINE__, zspage->isolated);
++	printk(KERN_INFO "%s:%d:zspage->magic:%d\n", __FILE__, __LINE__, zspage->magic);
++	printk(KERN_INFO "%s:%d:zspage->inuse:%d\n", __FILE__, __LINE__, zspage->inuse);
++	printk(KERN_INFO "%s:%d:zspage->freeobj:%d\n", __FILE__, __LINE__, zspage->freeobj);
++
+ 	spin_lock(&class->lock);
+ 	obj = obj_malloc(class, zspage, handle);
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
+ 	newfg = get_fullness_group(class, zspage);
++	printk(KERN_INFO "%s:%d:newfg:%d\n", __FILE__, __LINE__, newfg);
+ 	insert_zspage(class, zspage, newfg);
+ 	set_zspage_mapping(zspage, class->index, newfg);
+ 	record_obj(handle, obj);
++	printk(KERN_INFO "%s:%d:handle:%lu\n", __FILE__, __LINE__, handle);
++	printk(KERN_INFO "%s:%d:obj:%lu\n", __FILE__, __LINE__, obj);
+ 	atomic_long_add(class->pages_per_zspage,
+ 				&pool->pages_allocated);
+ 	zs_stat_inc(class, OBJ_ALLOCATED, class->objs_per_zspage);
+@@ -1521,6 +1636,10 @@ unsigned long zs_malloc(struct zs_pool *pool, size_t size, gfp_t gfp)
+ 	SetZsPageMovable(pool, zspage);
+ 	spin_unlock(&class->lock);
+ 
++	printk(KERN_INFO "%s:%d:handle:%lu\n", __FILE__, __LINE__, handle);
++
++	printk(KERN_INFO "zs_malloc() exit\n");
++
+ 	return handle;
+ }
+ EXPORT_SYMBOL_GPL(zs_malloc);
