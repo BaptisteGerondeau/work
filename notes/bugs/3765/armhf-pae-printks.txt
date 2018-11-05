@@ -1,0 +1,153 @@
+## ARMHF PAE (with 6GB RAM)
+
+inaddy@bug3765:~$ sudo mkfs.ext4 /dev/zram0 
+mke2fs 1.44.4 (18-Aug-2018)
+
+Filesystem too small for a journal
+Creating filesystem with 256 4k blocks and 128 inodes
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Writing superblocks and filesystem accounting information: 
+
+[   77.482368] zs_malloc() enter
+
+[   77.483890] mm/zsmalloc.c:1580:handle:3927183360
+[   77.486160] mm/zsmalloc.c:1581:size:89
+[   77.488224] mm/zsmalloc.c:1587:size:93
+[   77.490060] mm/zsmalloc.c:1588:size_class->size:96
+[   77.492447] mm/zsmalloc.c:1589:size_class->objs_per_zspage:128
+[   77.495298] mm/zsmalloc.c:1590:size_class->pages_per_zspage:3
+[   77.498356] mm/zsmalloc.c:1612:zspage ptr:3949625344
+[   77.500788] mm/zsmalloc.c:1614:zspage->fullness:0
+[   77.503078] mm/zsmalloc.c:1615:zspage->class:0
+[   77.505270] mm/zsmalloc.c:1616:zspage->isolated:0
+[   77.507710] mm/zsmalloc.c:1617:zspage->magic:88
+[   77.509924] mm/zsmalloc.c:1618:zspage->inuse:0
+[   77.512068] mm/zsmalloc.c:1619:zspage->freeobj:0
+
+	[   77.514288] obj_malloc() enter
+
+	[   77.514297] mm/zsmalloc.c:1499:zspage ptr:3949625344
+	[   77.518491] mm/zsmalloc.c:1500:handle:3927183360
+	[   77.520785] mm/zsmalloc.c:1505:handle:3927183361
+	[   77.523025] mm/zsmalloc.c:1506:obj:0
+	[   77.524728] mm/zsmalloc.c:1513:offset:0
+	[   77.526594] mm/zsmalloc.c:1514:nr_page:0
+	[   77.528814] mm/zsmalloc.c:1515:m_offset:0
+	[   77.530799] mm/zsmalloc.c:1516:m_page:4026087840
+	[   77.533078] mm/zsmalloc.c:1521:m_page:4026087840
+	[   77.535343] mm/zsmalloc.c:1525:vaddr ptr:4293779456
+	[   77.537888] mm/zsmalloc.c:1529:link ptr:4293779456
+
+		[   77.540201] location_to_obj() enter			- responsible for encoding a "handle" for the memory allocated (seems broken)
+
+		[   77.541913] mm/zsmalloc.c:900:page ptr:4026087840	- the "handle" value (what obj "ptr" contains) can't 
+		[   77.544207] mm/zsmalloc.c:901:obj_idx:0                be calculated correctly if the page frame number
+		[   77.546058] mm/zsmalloc.c:903:obj:0                    has 3 octets (like 0x1BCD4D in this case).
+		[   77.547951] mm/zsmalloc.c:904:page ptr:4026087840
+		[   77.550272] mm/zsmalloc.c:905:OBJ_INDEX_BITS:11
+
+		obj = page_to_pfn(page) << OBJ_INDEX_BITS;		- PFN == 1822029 ~ 6.95GB  0x1BCD4D
+
+		[   77.552511] mm/zsmalloc.c:907:obj:3731515392
+		[   77.554607] mm/zsmalloc.c:909:obj:3731515392
+		[   77.556701] mm/zsmalloc.c:910:obj_idx:0
+		[   77.558835] mm/zsmalloc.c:911:OBJ_INDEX_MASK:2047
+		[   77.561168] mm/zsmalloc.c:913:obj:3731515392
+		[   77.563269] mm/zsmalloc.c:915:obj:3731515392
+		[   77.565514] mm/zsmalloc.c:916:OBJ_TAG_BITS:1
+		[   77.567805] mm/zsmalloc.c:918:obj:3168063488
+
+		[   77.569910] location_to_obj() exit
+
+	[   77.571617] mm/zsmalloc.c:1545:m_page:4026087840
+	[   77.573873] mm/zsmalloc.c:1546:obj:3168063488
+
+	[   77.576060] obj_malloc() exit
+
+[   77.576068] mm/zsmalloc.c:1623:obj:3168063488
+[   77.579779] mm/zsmalloc.c:1625:newfg:1
+[   77.581575] mm/zsmalloc.c:1629:handle:3927183360
+[   77.583785] mm/zsmalloc.c:1630:obj:3168063488
+[   77.585861] mm/zsmalloc.c:1639:handle:3927183360
+
+[   77.588338] zs_malloc() exit
+
+[   77.589779] drivers/block/zram/zram_drv.c:1162:handle:3927183360
+[   77.592592] drivers/block/zram/zram_drv.c:1167:alloced_pages:3
+
+[   77.595450] zs_map_object() enter
+
+[   77.595458] mm/zsmalloc.c:1378:handle:3927183360
+
+	[   77.599670] pin_tag() enter
+	[   77.601069] mm/zsmalloc.c:953:handle pointing to obj:3927183360
+	[   77.603983] mm/zsmalloc.c:957:handle pointing to obj:3927183360
+	[   77.606837] pin_tag() exit
+
+[   77.608409] mm/zsmalloc.c:1384:handle:3927183360			
+[   77.610657] mm/zsmalloc.c:1389:handle:3927183360
+[   77.612908] mm/zsmalloc.c:1390:obj:3168063489
+
+	[   77.615003] obj_to_location() enter
+
+	[   77.616753] mm/zsmalloc.c:865:obj:3168063489
+	[   77.619165] mm/zsmalloc.c:866:page ptr:3930520184
+	[   77.621493] mm/zsmalloc.c:867:obj_idx:3226257152
+	[   77.623734] mm/zsmalloc.c:869:obj:3168063489
+	[   77.625808] mm/zsmalloc.c:870:OBJ_TAG_BITS:1
+
+	obj >>= OBJ_TAG_BITS
+
+	[   77.628001] mm/zsmalloc.c:872:obj:1584031744
+	[   77.630026] mm/zsmalloc.c:874:page ptr:3930520184
+	[   77.632256] mm/zsmalloc.c:875:obj:1584031744
+	[   77.634311] mm/zsmalloc.c:876:OBJ_INDEX_BITS:11
+	[   77.636487] mm/zsmalloc.c:878:page ptr:3992533408
+	[   77.639085] mm/zsmalloc.c:880:obj_idx:3226257152
+	[   77.641357] mm/zsmalloc.c:881:obj:1584031744
+	[   77.643412] mm/zsmalloc.c:882:OBJ_INDEX_MASK:2047
+	[   77.645721] mm/zsmalloc.c:884:obj_idx:0
+
+	[   77.647719] obj_to_location() exit
+
+[   77.649389] mm/zsmalloc.c:1393:page ptr:3992533408
+
+[   77.651800] Unable to handle kernel NULL pointer dereference at virtual address 00000000
+
+[   77.655669] pgd = (ptrval)
+[   77.657041] [00000000] *pgd=6a388003, *pmd=00000000
+[   77.659870] Internal error: Oops: 206 [#1] SMP ARM
+[   77.662273] Modules linked in: zram sha2_arm_ce sha256_arm sha1_arm_ce sha1_arm aes_arm_ce crypto_simd cryptd crc32_arm_ce
+[   77.667642] CPU: 2 PID: 712 Comm: mkfs.ext4 Not tainted 4.19.0-rc8-00016-gc343db455eb3-dirty #24
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
