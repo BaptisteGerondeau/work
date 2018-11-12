@@ -13,13 +13,13 @@ usage() {
     echo "[4] = rpm | deb | txz"
     echo "[5] = args"
     echo ""
-    echo "[5] (kselftest): stable-4.14 | stable-4.17 stable-4.18 mainline next"
+    echo "[5] (kselftest): stable-4.14 | stable-4.17 stable-4.18 stable-4.19 mainline next"
     echo ""
     echo "examples:"
     echo
     echo "$0 get ltp armhf deb"
     echo "$0 get libhugetlb amd64 rpm"
-    echo "$0 get kselftest i386 txz stable-4.18"
+    echo "$0 get kselftest i386 txz stable-4.19"
     exit 0
 }
 
@@ -40,7 +40,8 @@ kver=$5
 
 [ "$pkg" == "kselftest" ] && [ "$kver" != "stable-4.14" ] && \
     [ "$kver" != "stable-4.17" ] && [ "$kver" != "stable-4.18" ] && \
-    [ "$kver" != "mainline" ] && [ "$kver" != "next" ] && usage
+    [ "$kver" != "stable-4.19" ] && [ "$kver" != "mainline" ] && \
+    [ "$kver" != "next" ] && usage
 
 URL="$URL/$arch/$pkg"
 
@@ -70,6 +71,7 @@ else
     [ "$kver" == "stable-4.14" ] && kverstr="v4\.14\."
     [ "$kver" == "stable-4.17" ] && kverstr="v4\.17\."
     [ "$kver" == "stable-4.18" ] && kverstr="v4\.18\."
+    [ "$kver" == "stable-4.19" ] && kverstr="v4\.19\."
     [ "$kver" == "mainline" ] && kverstr="v4\.19-"
     [ "$kver" == "next" ] && kverstr="-next-"
 
