@@ -1,6 +1,6 @@
-From b5d1ce89713081fab6d40fb0a2bc16c5174b01f0 Mon Sep 17 00:00:00 2001
+From e765c08d147f8aad212606210181defd000214dd Mon Sep 17 00:00:00 2001
 From: Rafael David Tinoco <rafael.tinoco@linaro.org>
-Date: Thu, 1 Nov 2018 18:58:07 -0300
+Date: Thu, 8 Nov 2018 16:12:35 -0200
 Subject: [PATCH 1/2] syscalls/fremovexattr: Add fremovexattr() tests
 
 Fixes: #276
@@ -19,16 +19,16 @@ Signed-off-by: Rafael David Tinoco <rafael.tinoco@linaro.org>
  runtest/syscalls                              |   3 +
  .../kernel/syscalls/fremovexattr/.gitignore   |   2 +
  .../kernel/syscalls/fremovexattr/Makefile     |   8 ++
- .../syscalls/fremovexattr/fremovexattr01.c    | 105 ++++++++++++++
- .../syscalls/fremovexattr/fremovexattr02.c    | 130 ++++++++++++++++++
- 5 files changed, 248 insertions(+)
+ .../syscalls/fremovexattr/fremovexattr01.c    |  99 ++++++++++++++
+ .../syscalls/fremovexattr/fremovexattr02.c    | 126 ++++++++++++++++++
+ 5 files changed, 238 insertions(+)
  create mode 100644 testcases/kernel/syscalls/fremovexattr/.gitignore
  create mode 100644 testcases/kernel/syscalls/fremovexattr/Makefile
  create mode 100644 testcases/kernel/syscalls/fremovexattr/fremovexattr01.c
  create mode 100644 testcases/kernel/syscalls/fremovexattr/fremovexattr02.c
 
 diff --git a/runtest/syscalls b/runtest/syscalls
-index 2ac9f7665..c48ada707 100644
+index 95bb47b96..24110b623 100644
 --- a/runtest/syscalls
 +++ b/runtest/syscalls
 @@ -319,6 +319,9 @@ fork14 fork14
@@ -66,10 +66,10 @@ index 000000000..f71e4fc25
 \ No newline at end of file
 diff --git a/testcases/kernel/syscalls/fremovexattr/fremovexattr01.c b/testcases/kernel/syscalls/fremovexattr/fremovexattr01.c
 new file mode 100644
-index 000000000..f51a434cc
+index 000000000..96b92fb24
 --- /dev/null
 +++ b/testcases/kernel/syscalls/fremovexattr/fremovexattr01.c
-@@ -0,0 +1,105 @@
+@@ -0,0 +1,99 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Copyright (c) 2018 Linaro Limited. All rights reserved.
@@ -108,7 +108,7 @@ index 000000000..f51a434cc
 +#define FNAME MNTPOINT"/fremovexattr01testfile"
 +
 +static int fd = -1;
-+static char *got_value;
++static char got_value[XATTR_TEST_VALUE_SIZE];
 +
 +static void verify_fremovexattr(void)
 +{
@@ -117,18 +117,12 @@ index 000000000..f51a434cc
 +
 +	TEST(fremovexattr(fd, XATTR_TEST_KEY));
 +
-+	if (TST_RET == -1 && TST_ERR == EOPNOTSUPP) {
-+		tst_brk(TCONF, "fremovexattr(2) not supported");
-+		return;
-+	}
-+
 +	if (TST_RET != 0) {
-+		tst_res(TFAIL | TTERRNO, "fremovexattr(2) failed with %li",
-+				TST_RET);
++		tst_res(TFAIL | TTERRNO, "fremovexattr(2) failed");
 +		return;
 +	}
 +
-+	memset(got_value, 0, XATTR_TEST_VALUE_SIZE);
++	memset(&got_value, 0, XATTR_TEST_VALUE_SIZE);
 +
 +	TEST(fgetxattr(fd, XATTR_TEST_KEY, got_value, XATTR_TEST_VALUE_SIZE));
 +
@@ -147,18 +141,18 @@ index 000000000..f51a434cc
 +
 +static void cleanup(void)
 +{
-+	free(got_value);
-+
-+	close(fd);
++	if (fd > 0)
++		SAFE_CLOSE(fd);
 +}
 +
 +static void setup(void)
 +{
-+	SAFE_TOUCH(FNAME, 0644, NULL);
++	fd = SAFE_OPEN(FNAME, O_RDWR | O_CREAT, 0644);
 +
-+	fd = SAFE_OPEN(FNAME, O_RDWR, NULL);
++	TEST(fremovexattr(fd, XATTR_TEST_KEY));
 +
-+	got_value = SAFE_MALLOC(XATTR_TEST_VALUE_SIZE);
++	if (TST_RET == -1 && TST_ERR == EOPNOTSUPP)
++		tst_brk(TCONF, "fremovexattr(2) not supported");
 +}
 +
 +static struct tst_test test = {
@@ -177,10 +171,10 @@ index 000000000..f51a434cc
 +#endif
 diff --git a/testcases/kernel/syscalls/fremovexattr/fremovexattr02.c b/testcases/kernel/syscalls/fremovexattr/fremovexattr02.c
 new file mode 100644
-index 000000000..5585b6abe
+index 000000000..8eb1e9a99
 --- /dev/null
 +++ b/testcases/kernel/syscalls/fremovexattr/fremovexattr02.c
-@@ -0,0 +1,130 @@
+@@ -0,0 +1,126 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + * Copyright (c) 2018 Linaro Limited. All rights reserved.
@@ -225,9 +219,6 @@ index 000000000..5585b6abe
 +struct test_case {
 +	int fd;
 +	char *key;
-+	char *value;
-+	char *gotvalue;
-+	int size;
 +	int exp_ret;
 +	int exp_err;
 +};
@@ -283,8 +274,7 @@ index 000000000..5585b6abe
 +{
 +	size_t i = 0;
 +
-+	SAFE_TOUCH(FNAME, 0644, NULL);
-+	fd = SAFE_OPEN(FNAME, O_RDWR, NULL);
++	fd = SAFE_OPEN(FNAME, O_RDWR | O_CREAT, 0644);
 +
 +	for (i = 0; i < ARRAY_SIZE(tc); i++) {
 +
