@@ -15,15 +15,13 @@
 
 #define FILENAME "nula"
 
-int
-main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	int filed = 0, sockfd = 0;
 	struct sockaddr_un sun;
 
 	unlink(FILENAME);
 
-	if((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
+	if ((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
 		fprintf(stderr, "could not create socket\n");
 		goto cleanup;
 	}
@@ -32,14 +30,14 @@ main(int argc, char **argv)
 	sun.sun_family = AF_UNIX;
 	strncpy(sun.sun_path, FILENAME, sizeof(sun.sun_path) - 1);
 
-	if(bind(sockfd, (const struct sockaddr *) &sun,
+	if (bind(sockfd, (const struct sockaddr *) &sun,
 			sizeof(struct sockaddr_un)) < 0) {
 		fprintf(stderr, "could not bind socket\n");
 		goto cleanup;
 	}
 
-	if(fsetxattr(sockfd, "user.testkey", "this is a test value",
-			20, XATTR_CREATE) < 0) {
+	if (fsetxattr(sockfd, "user.testkey", "this is a test value", 20,
+			XATTR_CREATE) < 0) {
 		fprintf(stderr, "could not fsetxattr\n");
 		perror("fsetxattr");
 		goto cleanup;
@@ -76,8 +74,7 @@ main(int argc, char **argv)
 //	if (filed > 0)
 //		close(filed);
 
-cleanup:
-	if (sockfd > 0)
+	cleanup: if (sockfd > 0)
 		close(sockfd);
 
 	exit(0);
