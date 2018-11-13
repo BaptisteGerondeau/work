@@ -38,6 +38,7 @@ for arch in $(ls -1 archs); do
         PKGS=""
         PKGS+="$(ls -1t archs/$arch/kselftest/*v4.17*.txz | sort -u | tail -1) "
         PKGS+="$(ls -1t archs/$arch/kselftest/*v4.18.*.txz | sort -u | tail -1) "
+        PKGS+="$(ls -1t archs/$arch/kselftest/*v4.19.*.txz | sort -u | tail -1) "
         PKGS+="$(ls -1t archs/$arch/kselftest/*v4.19-*.txz | sort -u | tail -1) "
         PKGS+="$(ls -1t archs/$arch/kselftest/*v4.14.*.txz | sort -u | tail -1) "
         PKGS+="$(ls -1t archs/$arch/kselftest/*next-*.txz | sort -u | tail -1) "
