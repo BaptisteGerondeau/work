@@ -45,3 +45,4 @@ meta-rpb-mine https://github.com/96boards/meta-rpb.git
 qa_test-definitions https://git.linaro.org/qa/test-definitions.git/
 qa_reports-known-issues https://github.com/Linaro/qa-reports-known-issues
 qa_reports-known-issues-mine git@github.com:rafaeldtinoco/qa-reports-known-issues.git
+jobs_configs https://git.linaro.org/ci/job/configs.git
