@@ -82,7 +82,7 @@ for dir in $DIRS; do
 
     cd $dir
 
-    #echo ++++++++ ENTERING $dir ...
+    echo ++++++++ ENTERING $dir ...
 
     echo "# $dir"
 
@@ -96,7 +96,7 @@ for dir in $DIRS; do
     git fetch -a 2>&1 | grep -v "redirecting to"
     BRANCH=$(git branch | grep "*" | sed 's:* ::g')
     git reset --hard origin/$BRANCH
-    #echo -------- CLOSING $dir
+    echo -------- CLOSING $dir
 
     cd $OLDDIR
 
