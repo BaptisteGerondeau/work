@@ -56,19 +56,17 @@ cd $MAINDIR
 
 cat << EOF | sudo tee $TDIR/config 2>&1 > $LOGFILE 2>&1
 lxc.include = /usr/share/lxc/config/debian.common.conf
-lxc.arch = linux32
+lxc.arch = linux64
 
+lxc.net.0.type = veth
+lxc.net.0.link = bridge0
+lxc.net.0.flags = up
+lxc.net.0.hwaddr = $RANDMAC
 lxc.mount.entry = / mnt none bind 0 0
 lxc.mount.entry = $HOME ${HOME:1} none bind 0 0
 lxc.mount.entry = $HOME mnt/${HOME:1} none bind 0 0
-lxc.rootfs.backend = dir
-lxc.rootfs = $TARGET
-lxc.utsname = lxc$$
-
-lxc.network.type = veth
-lxc.network.link = bridge0
-lxc.network.flags = up
-lxc.network.hwaddr = $RANDMAC
+lxc.rootfs.path = $TARGET
+lxc.uts.name = lxc$$
 EOF
 
 GMOUNT=$(which guestmount)
