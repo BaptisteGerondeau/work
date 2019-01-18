@@ -15,4 +15,4 @@ VERSION_UPSTREAM = $(shell echo '$(DEB_VERSION_UPSTREAM)')
 	dh $@ --parallel
 
 override_dh_auto_configure:
-	./configure --prefix=/opt/ltp
+	./configure --prefix=/opt/ltp --with-open-posix-testsuite --with-realtime-testsuite
