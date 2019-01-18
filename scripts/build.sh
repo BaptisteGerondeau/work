@@ -13,7 +13,7 @@ MAINDIR=$(dirname $0)
 # VARIABLES (TODO: turn all this into args)
 
 NUMCPU=`cat /proc/cpuinfo | grep proce | wc -l`
-NCPU=$(($NUMCPU - 1))
+NCPU=$(($NUMCPU + 2))
 #NCPU=1
 
 MYARCH="amd64"  # (amd64|x86|arm64|armhf|armel)
@@ -31,7 +31,7 @@ KCLEAN=1        # want to run make clean ? (default: 1)
 KCONFIG=1       # want to copy and process conf file ? (default: 1)
 KMCONFIG=0      # want a menu to add/remove stuff from .config ? (default: 0)
 KLCONFIG=0      # want to merge a lsmod file into .config ? (default: 0)
-KPREPARE=1      # want to prepare ? (default: 1)
+KPREPARE=0      # want to prepare ? (default: 1)
 KBUILD=1        # want to build ? :o) (default: 1)
 KDEBUG=0        # want your kernel to have debug symbols ? (default: 1)
 KVERBOSE=0      # want it to shut up ? (default: 1)
