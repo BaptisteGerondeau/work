@@ -24,6 +24,14 @@ gitclone() {
     git clone $url $name
 }
 
+gitsvnclone() {
+    name=$1
+    url=$2
+    echo ====
+    echo CLONING \(svn\): $1
+    git svn clone $url $name
+}
+
 cd $MAINDIR
 
 FILE=$(ls -1 1_* | head -1)
@@ -33,7 +41,14 @@ FILE=$(ls -1 1_* | head -1)
 while read name url
 do
     [ -d $name ] && continue
-    gitclone $name $url
+
+    echo $url | grep -q svn
+
+    if [ $? == 0 ]; then
+        gitsvnclone $name $url
+    else
+        gitclone $name $url
+    fi
 
 done < $FILE
 
