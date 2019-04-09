@@ -1,1 +1,7 @@
 llvm-project https://github.com/llvm/llvm-project.git
+gcc git://gcc.gnu.org/git/gcc.git
+elfutils git://sourceware.org/git/elfutils.git
+valgrind git://sourceware.org/git/valgrind.git
+systemtap git://sourceware.org/git/systemtap.git
+glibc git://sourceware.org/git/glibc.git
+gdb git://sourceware.org/git/binutils-gdb.git

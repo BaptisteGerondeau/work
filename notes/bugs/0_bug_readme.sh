@@ -1,1 +1,0 @@
-../../scripts/bug_readme.sh
