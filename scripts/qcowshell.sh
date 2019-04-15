@@ -49,7 +49,6 @@ cd $MAINDIR
 [ ! -d $MACHINEDIR ] && getout "tell me the machine!"
 [ ! -f $QCOWFILE ] && getout "where is the file $QCOWFILE ?"
 
-[ ! $(which guestmount) ] && getout "no guestmount found"
 [ ! $(which chroot) ] && getout "no chroot found"
 [ ! $(which lxc-start) ] && getout "no lxc-start found"
 [ ! $(which fsck.ext4) ] && getout "no fsck.ext4 found"
@@ -69,15 +68,11 @@ lxc.rootfs.path = $TARGET
 lxc.uts.name = lxc$$
 EOF
 
-GMOUNT=$(which guestmount)
 MOUNT=$(which mount)
 FSCK=$(which fsck.ext4)
 UMOUNT=$(which umount)
 CHROOT=$(which chroot)
 QEMUNBD=$(which qemu-nbd)
-
-# $SUDO $GMOUNT -a $QCOWFILE -o suid -m /dev/sda $TARGET
-# or (for sudo to work):
 
 set +e
 
