@@ -1,21 +1,16 @@
 #!/bin/bash
 
 ## variables
-
-HOSTNAME="centos"
-VCPUS=4
-RAMGB=4
-PACKAGES="locales,less,vim,sudo,openssh-server,bash-completion,wget,rsync,git"
-INTERFACE="vlan40"
-
-## unlikely to be changed
-
-IMGDIR="/var/lib/libvirt/images"
+MAINDIR=$(dirname $0)
+[ "$MAINDIR" == "." ] && MAINDIR=$(pwd)
+IMGDIR="/var/lib/libvirt/images/$HOSTNAME"
 TARGET="/target/$HOSTNAME"
-NBDDEV="/dev/nbd2"
 
-#LOCALE="locale-gen en_US.UTF-8"
-LOCALE="localedef -i en_US -f UTF-8 en_US.UTF-8"
+DISTRIBUTION=$1
+
+[ ! $DISTRIBUTION ] && getout "tell me the distribution!"
+source "$MAINDIR/../config/$DISTRIBUTION.default"
+source "$MAINDIR/../config/$DISTRIBUTION.local"
 ## end of variables
 
 if [ $UID -ne 0 ]
@@ -29,12 +24,12 @@ set +e
 
 if [ ! -d $IMGDIR ]
 then
-    exit 1
+    getout "$IMGDIR doesn't exist!"
 fi
 
 if [ -d $IMGDIR/$HOSTNAME ]
 then
-    exit 1
+    getout "$IMGDIR/$HOSTNAME isn't empty! Delete it"
 fi
 
 set -e
@@ -68,86 +63,8 @@ set -e
 
 mount $NBDDEV $TARGET
 
-#debootstrap --include=$PACKAGES \
-#            sid \
-#            $TARGET \
-#            http://deb.debian.org/debian/
-
-sudo apt install -y rpm yum python-m2crypto
-rpm --root $TARGET --initdb
-rpm -ivh --force-debian --nodeps --root $TARGET http://mirror.centos.org/altarch/7/os/aarch64/Packages/centos-release-7-6.1810.2.el7.centos.a.aarch64.rpm
-ln -s $TARGET/etc/pki /etc/pki
-yum --installroot $TARGET -y install yum passwd shadow shadow-utils iputils iproute
-
-mount -o bind /dev $TARGET/dev
-mount -o bind /dev/pts $TARGET/dev/pts
-mount -o bind /sys $TARGET/sys
-mount -o bind /proc $TARGET/proc
-
-echo $HOSTNAME | tee $TARGET/etc/hostname
-
-chroot $TARGET /bin/bash -c "passwd -d root"
-chroot $TARGET /bin/bash -c "echo root:root | chpasswd"
-
-chroot $TARGET /bin/bash -c "useradd -d /home/inaddy -m -s /bin/bash inaddy"
-chroot $TARGET /bin/bash -c "passwd -d inaddy"
-chroot $TARGET /bin/bash -c "echo inaddy:inaddy | chpasswd"
-
-chroot $TARGET /bin/bash -c "useradd -d /home/bgerdeb -m -s /bin/bash bgerdeb"
-chroot $TARGET /bin/bash -c "passwd -d bgerdeb"
-chroot $TARGET /bin/bash -c "echo bgerdeb:bgerdeb | chpasswd"
-
-echo """## /etc/sudoers
-
-Defaults env_keep += \"LANG LANGUAGE LINGUAS LC_* _XKB_CHARSET\"
-Defaults env_keep += \"HOME EDITOR SYSTEMD_EDITOR PAGER\"
-Defaults env_keep += \"XMODIFIERS GTK_IM_MODULE QT_IM_MODULE QT_IM_SWITCHER\"
-
-Defaults secure_path=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"
-
-Defaults logfile=/var/log/sudo.log,loglinelen=0
-Defaults !syslog, !pam_session
-
-root ALL=(ALL) NOPASSWD: ALL
-%wheel ALL=(ALL) NOPASSWD: ALL
-%sudo ALL=(ALL) NOPASSWD: ALL
-inaddy ALL=(ALL) NOPASSWD: ALL
-bgerdeb ALL=(ALL) NOPASSWD: ALL
-
-## end of file""" | tee $TARGET/etc/sudoers
-
-echo """## /etc/fstab
-
-LABEL=ROOT / ext4 errors=remount-ro 0 1
-
-## end of file""" | tee $TARGET/etc/fstab
-
-echo """## /etc/sysconfig/network
-
-NETWORKING=yes
-
-## end of file""" | tee $TARGET/etc/sysconfig/network
-
-echo """## /etc/resolv.conf
-
-nameserver 10.40.0.1
-nameserver 8.8.8.8
-nameserver 8.8.4.4
-
-## end of file""" | tee $TARGET/etc/resolv.conf
-
-ARCH=$(uname -r | cut -d'-' -f3)
-
-#chroot $TARGET /bin/bash -c "apt-get update"
-#chroot $TARGET /bin/bash -c "apt-get install -y linux-image-$ARCH linux-headers-$ARCH"
-#chroot $TARGET /bin/bash -c "apt-get build-dep -y hello"
-#chroot $TARGET /bin/bash -c "apt-get build-dep -y linux-image-$ARCH"
-
-chroot $TARGET /bin/bash -c "rpm --initdb"
-chroot $TARGET /bin/bash -c "yum clean all"
-chroot $TARGET /bin/bash -c "yum --releasever=7 install -y yum centos-release"
-chroot $TARGET /bin/bash -c "yum --releasever=7 install -y @core @base kernel kernel-headers redhat-lsb-core dracut-tools dracut-config-generic dracut-config-rescue ${PACKAGES//,/ }"
-chroot $TARGET /bin/bash -c "$LOCALE" 
+### Make the image
+source "$MAINDIR/makeimage.$DISTRIBUTION.sh" || getout "makeimage.$DISTRIBUTION.sh not found"
 
 umount $TARGET/dev/pts
 umount $TARGET/dev
