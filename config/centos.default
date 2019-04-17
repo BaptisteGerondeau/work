@@ -1,0 +1,15 @@
+#!/bin/bash
+
+## variables
+
+HOSTNAME="centos"
+VCPUS=4
+RAMGB=4
+PACKAGES="locales,less,vim,sudo,openssh-server,bash-completion,wget,rsync,git"
+INTERFACE="vlan40"
+LOCALE="localedef -i en_US -f UTF-8 en_US.UTF-8"
+NBDDEV="/dev/nbd1"
+CENTOS_RELEASE_RPM_URL=http://mirror.centos.org/altarch/7/os/aarch64/Packages/centos-release-7-6.1810.2.el7.centos.a.aarch64.rpm
+
+# Install dependencies
+sudo apt install -y rpm yum python-m2crypto uuid-runtime
