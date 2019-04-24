@@ -1,35 +1,35 @@
 #!/bin/bash
 
-## variables
-MAINDIR=$(dirname $0)
-[ "$MAINDIR" == "." ] && MAINDIR=$(pwd)
-IMGDIR="/var/lib/libvirt/images/$HOSTNAME"
-TARGET="/target/$HOSTNAME"
-
-DISTRIBUTION=$1
-
-[ ! $DISTRIBUTION ] && getout "tell me the distribution!"
-source "$MAINDIR/../config/$DISTRIBUTION.default"
-source "$MAINDIR/../config/$DISTRIBUTION.local"
-## end of variables
-
 if [ $UID -ne 0 ]
 then
-    sudo $0
+    sudo $0 $1
     exit 0
 fi
 
 set -x
 set +e
 
+## variables
+MAINDIR=$(dirname $0)
+[ "$MAINDIR" == "." ] && MAINDIR=$(pwd)
+DISTRIBUTION=$1
+[ -z ${DISTRIBUTION} ] && echo "tell me the distribution!" && exit 1
+source "$MAINDIR/../config/$DISTRIBUTION.default"
+[ -f "$MAINDIR/../config/$DISTRIBUTION.local" ] && source "$MAINDIR/../config/$DISTRIBUTION.local"
+
+IMGDIR="/var/lib/libvirt/images"
+TARGET="/target/$HOSTNAME"
+
+## end of variables
+
 if [ ! -d $IMGDIR ]
 then
-    getout "$IMGDIR doesn't exist!"
+    echo "$IMGDIR doesn't exist!" && exit 1
 fi
 
 if [ -d $IMGDIR/$HOSTNAME ]
 then
-    getout "$IMGDIR/$HOSTNAME isn't empty! Delete it"
+    echo "$IMGDIR/$HOSTNAME isn't empty! Delete it" && exit 1
 fi
 
 set -e
@@ -39,15 +39,19 @@ TMPFILE="$IMGDIR/$HOSTNAME/disk01.ext4.qcow2"
 
 mkdir $TMPDIR
 
+#sudo apt-get install libguestfs-tools 
 modprobe nbd max_part=16
+source "$MAINDIR/nbdfinder.sh"
 
 qemu-nbd -d $NBDDEV 2>&1 > /dev/null
 qemu-nbd -d $NBDDEV 2>&1 > /dev/null
 qemu-nbd -d $NBDDEV 2>&1 > /dev/null
+udevadm settle
 
 [ -f $TMPFILE ] && rm $TMPFILE
 qemu-img create -f qcow2 $TMPFILE 30G
 qemu-nbd -c $NBDDEV $TMPFILE
+udevadm settle
 mkfs.ext4 -LROOT $NBDDEV
 
 set +e
@@ -61,20 +65,18 @@ umount $TARGET 2>&1 /dev/null
 
 set -e
 
+# guestmount -a $TMPFILE -m /dev/sda1 --rw $TARGET
+# Cannot unmount after script failure
 mount $NBDDEV $TARGET
 
 ### Make the image
-source "$MAINDIR/makeimage.$DISTRIBUTION.sh" || getout "makeimage.$DISTRIBUTION.sh not found"
+source "$MAINDIR/makeimage.$DISTRIBUTION.sh" || echo "makeimage.$DISTRIBUTION.sh not found" && exit 1
 
 umount $TARGET/dev/pts
 umount $TARGET/dev
 umount $TARGET/sys
 umount $TARGET/proc
 umount $TARGET
-
-qemu-nbd -d $NBDDEV
-qemu-nbd -d $NBDDEV 2>&1 > /dev/null
-qemu-nbd -d $NBDDEV 2>&1 > /dev/null
 
 NEWUUID=$(uuidgen)
 NEWMAC=$(printf '52:54:00:%02X:%02X:%02X\n' $[RANDOM%256] $[RANDOM%256] $[RANDOM%256])

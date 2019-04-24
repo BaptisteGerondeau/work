@@ -2,9 +2,15 @@
 
 ### DO NOT CALL FIRST : Call "scripts/makeguest.sh centos"
 rpm --root $TARGET --initdb
-rpm -ivh --force-debian --nodeps --root $TARGET $CENTOS_RELEASE_RPM_URL
+wget $CENTOS_RELEASE_RPM_URL
+rpm -ivh --force-debian --nodeps --root $TARGET $(basename $CENTOS_RELEASE_RPM_URL) 
+rm -rf /etc/pki
 ln -s $TARGET/etc/pki /etc/pki
-yum --installroot $TARGET -y install yum passwd shadow shadow-utils iputils iproute
+yum --installroot $TARGET -y install bash yum passwd shadow shadow-utils iputils iproute
+
+mkdir -p $TARGET/dev/pts
+mkdir -p $TARGET/sys
+mkdir -p $TARGET/proc
 
 mount -o bind /dev $TARGET/dev
 mount -o bind /dev/pts $TARGET/dev/pts
@@ -13,16 +19,16 @@ mount -o bind /proc $TARGET/proc
 
 echo $HOSTNAME | tee $TARGET/etc/hostname
 
-chroot $TARGET /bin/bash -c "passwd -d root"
-chroot $TARGET /bin/bash -c "echo root:root | chpasswd"
+chroot $TARGET /bin/sh -c "passwd -d root"
+chroot $TARGET /bin/sh -c "echo root:root | chpasswd"
 
-chroot $TARGET /bin/bash -c "useradd -d /home/inaddy -m -s /bin/bash inaddy"
-chroot $TARGET /bin/bash -c "passwd -d inaddy"
-chroot $TARGET /bin/bash -c "echo inaddy:inaddy | chpasswd"
+chroot $TARGET /bin/sh -c "useradd -d /home/inaddy -m -s /bin/bash inaddy"
+chroot $TARGET /bin/sh -c "passwd -d inaddy"
+chroot $TARGET /bin/sh -c "echo inaddy:inaddy | chpasswd"
 
-chroot $TARGET /bin/bash -c "useradd -d /home/bgerdeb -m -s /bin/bash bgerdeb"
-chroot $TARGET /bin/bash -c "passwd -d bgerdeb"
-chroot $TARGET /bin/bash -c "echo bgerdeb:bgerdeb | chpasswd"
+chroot $TARGET /bin/sh -c "useradd -d /home/bgerdeb -m -s /bin/bash bgerdeb"
+chroot $TARGET /bin/sh -c "passwd -d bgerdeb"
+chroot $TARGET /bin/sh -c "echo bgerdeb:bgerdeb | chpasswd"
 
 echo """## /etc/sudoers
 
@@ -65,8 +71,8 @@ nameserver 8.8.4.4
 
 ARCH=$(uname -r | cut -d'-' -f3)
 
-chroot $TARGET /bin/bash -c "rpm --initdb"
-chroot $TARGET /bin/bash -c "yum clean all"
-chroot $TARGET /bin/bash -c "yum --releasever=7 install -y yum centos-release"
+chroot $TARGET /bin/sh -c "rpm --initdb"
+chroot $TARGET /bin/sh -c "yum clean all"
+chroot $TARGET /bin/sh -c "yum --releasever=7 install -y yum bash centos-release"
 chroot $TARGET /bin/bash -c "yum --releasever=7 install -y @core @base kernel kernel-headers redhat-lsb-core dracut-tools dracut-config-generic dracut-config-rescue ${PACKAGES//,/ }"
 chroot $TARGET /bin/bash -c "$LOCALE"

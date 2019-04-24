@@ -1,7 +1,7 @@
 #!/bin/bash
 
 debootstrap --include=$PACKAGES \
-            sid \
+            buster \
             $TARGET \
             http://deb.debian.org/debian/
 
