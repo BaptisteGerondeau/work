@@ -70,7 +70,7 @@ set -e
 mount $NBDDEV $TARGET
 
 ### Make the image
-source "$MAINDIR/makeimage.$DISTRIBUTION.sh" || echo "makeimage.$DISTRIBUTION.sh not found" && exit 1
+source "$MAINDIR/makeimage.$DISTRIBUTION.sh" || { echo "makeimage.$DISTRIBUTION.sh not found" && exit 1 }
 
 umount $TARGET/dev/pts
 umount $TARGET/dev
@@ -157,10 +157,8 @@ XML="""<domain type='kvm'>
 
 echo $XML > $TMPDIR/$HOSTNAME.xml
 
+if ! $(virsh define $TMPDIR/$HOSTNAME.xml); then
 virsh destroy $HOSTNAME
+fi
+
 virsh define $TMPDIR/$HOSTNAME.xml
-
-virsh list --all
-
-./qcowvmlinuz.sh $HOSTNAME
-

@@ -5,7 +5,11 @@
 HOSTNAME="centos"
 VCPUS=4
 RAMGB=4
-PACKAGES="locales,less,vim,sudo,openssh-server,bash-completion,wget,rsync,git"
+PACKAGES="""\
+locales,less,vim,sudo,openssh-server,bash-completion,\
+wget,rsync,git,bridge-utils,vlan,net-tools,xterm,ncurses-term,\
+@Development Tools\
+"""
 INTERFACE="vlan40"
 LOCALE="localedef -i en_US -f UTF-8 en_US.UTF-8"
 NBDDEV="/dev/nbd4"
