@@ -2,8 +2,8 @@
 
 if [ $UID -ne 0 ]
 then
-    echo g0t r00t ?!
-    exit 1
+    sudo $0
+    exit 0
 fi
 
 NUMVFS=32
@@ -93,7 +93,7 @@ echo
 echo setting numbers for VIFs port and node GUIDs
 echo
 
-NUM=$(printf "%d" $(sudo ibstat | grep "Port GUID" | grep -v "0x0000000000000000" | awk '{print $3}' | sort | tail -1))
+NUM=$(printf "%d" $(ibstat | grep "Port GUID" | grep -v "0x0000000000000000" | awk '{print $3}' | sort | tail -1))
 
 for ibface in $IBFACE
 do
@@ -176,6 +176,6 @@ done
 rm $FILE
 
 echo
-echo run "ibstat -s" to get status for each device (all of them should be online now)
+echo "run \"ibstat -s\" to get status for each device (all of them should be online now)"
 echo
 
