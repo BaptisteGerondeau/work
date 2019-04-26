@@ -51,7 +51,7 @@ bgerdeb ALL=(ALL) NOPASSWD: ALL
 
 echo """## /etc/fstab
 
-LABEL=ROOT / ext4 errors=remount-ro 0 1
+LABEL=ROOT / ext4 defaults 0 1
 
 ## end of file""" | tee $TARGET/etc/fstab
 
@@ -69,7 +69,23 @@ nameserver 8.8.4.4
 
 ## end of file""" | tee $TARGET/etc/resolv.conf
 
-ARCH=$(uname -r | cut -d'-' -f3)
+
+echo """## /etc/sysconfig/network-scripts/ifcfg-eth0
+
+DEVICE=eth0
+ONBOOT=yes
+DHCP=yes
+
+## end of file""" | tee $TARGET/etc/sysconfig/network-scripts/ifcfg-eth0
+
+echo """## /etc/selinux/config
+
+SELINUX=disabled
+SELINUXTYPE=targeted 
+
+## end of file""" | tee $TARGET/etc/selinux/config
+
+cat /root/.ssh/authorized_keys | tee $TARGET/root/.ssh/authorized_keys
 
 chroot $TARGET /bin/sh -c "rpm --initdb"
 chroot $TARGET /bin/sh -c "yum clean all"

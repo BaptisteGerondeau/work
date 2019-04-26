@@ -2,7 +2,7 @@
 
 if [ $UID -ne 0 ]
 then
-    sudo $0 $1
+    sudo NBDDEV=$NBDDEV $0 $1
     exit 0
 fi
 
@@ -70,7 +70,19 @@ set -e
 mount $NBDDEV $TARGET
 
 ### Make the image
-source "$MAINDIR/makeimage.$DISTRIBUTION.sh" || { echo "makeimage.$DISTRIBUTION.sh not found" && exit 1 }
+source "$MAINDIR/makeimage.$DISTRIBUTION.sh" || { echo "makeimage.$DISTRIBUTION.sh not found"; exit 1; }
+
+# bring kernel image + ramdisk to host
+if [ ! $VMLINUZ ] || [ ! $INITRD ]; then
+	VMLINUZ=$($SUDO ls -1tr $TARGET/boot/vmlinuz* | tail -1)
+	INITRD=$($SUDO ls -1tr $TARGET/boot/initr* | tail -1)
+fi
+
+if [ -d $MACHINEDIR ]; then
+	echo "linux=$VMLINUZ initrd=$INITRD"
+	$SUDO cp $VMLINUZ $TMPDIR/vmlinuz
+	$SUDO cp $INITRD $TMPDIR/initrd.img
+fi
 
 umount $TARGET/dev/pts
 umount $TARGET/dev
@@ -157,8 +169,8 @@ XML="""<domain type='kvm'>
 
 echo $XML > $TMPDIR/$HOSTNAME.xml
 
-if ! $(virsh define $TMPDIR/$HOSTNAME.xml); then
-virsh destroy $HOSTNAME
+if ! $(virsh define $TMPDIR/$HOSTNAME.xml &> /dev/null); then
+virsh undefine $HOSTNAME
 fi
 
 virsh define $TMPDIR/$HOSTNAME.xml
