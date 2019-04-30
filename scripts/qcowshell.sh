@@ -54,16 +54,16 @@ cd $MAINDIR
 [ ! $(which fsck.ext4) ] && getout "no fsck.ext4 found"
 
 cat << EOF | sudo tee $TDIR/config 2>&1 > $LOGFILE 2>&1
-lxc.include = /usr/share/lxc/config/debian.common.conf
+lxc.include = /usr/share/lxc/config/centos.common.conf
 lxc.arch = linux64
 
 lxc.net.0.type = veth
-lxc.net.0.link = bridge0
+lxc.net.0.link = virbr0
 lxc.net.0.flags = up
 lxc.net.0.hwaddr = $RANDMAC
 lxc.mount.entry = / mnt none bind 0 0
-lxc.mount.entry = $HOME ${HOME:1} none bind 0 0
-lxc.mount.entry = $HOME mnt/${HOME:1} none bind 0 0
+lxc.mount.entry = $HOME ${HOME:1} none bind,rw,user,exec 0 0
+lxc.mount.entry = $HOME mnt/${HOME:1} none bind,rw,user,exec 0 0
 lxc.rootfs.path = $TARGET
 lxc.uts.name = lxc$$
 EOF
@@ -135,19 +135,19 @@ elif [ x$ARG0 == x"qcowvmlinuz.sh" ]; then
     # bring kernel image + ramdisk to host
 
     if [ $ARGUMENT ]; then
-        VMLINUZ=$(ls -1tr $TARGET/boot/vmlinuz* | grep -i $ARGUMENT | tail -1)
-        INITRD=$(ls -1tr $TARGET/boot/initrd* | grep -i $ARGUMENT | tail -1)
+        VMLINUZ=$($SUDO ls -1tr $TARGET/boot/vmlinuz* | grep -i $ARGUMENT | tail -1)
+        INITRD=$($SUDO ls -1tr $TARGET/boot/initr* | grep -i $ARGUMENT | tail -1)
     fi
 
     if [ ! $VMLINUZ ] || [ ! $INITRD ]; then
-        VMLINUZ=$(ls -1tr $TARGET/boot/vmlinuz* | tail -1)
-        INITRD=$(ls -1tr $TARGET/boot/initrd* | tail -1)
+        VMLINUZ=$($SUDO ls -1tr $TARGET/boot/vmlinuz* | tail -1)
+        INITRD=$($SUDO ls -1tr $TARGET/boot/initr* | tail -1)
     fi
 
     if [ -d $MACHINEDIR ]; then
         echo "bringing lxc$$ ($MACHINE) kernel/ramdisk to host"
-        sudo cp $VMLINUZ $MACHINEDIR/vmlinuz
-        sudo cp $INITRD $MACHINEDIR/initrd.img
+        $SUDO cp $VMLINUZ $MACHINEDIR/vmlinuz
+        $SUDO cp $INITRD $MACHINEDIR/initrd.img
     fi
 
 elif [ x$ARG0 == x"qcowkerninst.sh" ]; then
