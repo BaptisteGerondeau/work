@@ -1,0 +1,17 @@
+#!/bin/bash
+
+## variables
+
+HOSTNAME="debian"
+VCPUS=4
+RAMGB=4
+PACKAGES="""\
+locales,less,vim,sudo,openssh-server,bash-completion,\
+wget,rsync,git,bridge-utils,vlan,net-tools,xterm,ncurses-term,\
+build-essential\
+"""
+INTERFACE="vlan40"
+LOCALE="locale-gen en_US.UTF-8"
+NBDDEV="/dev/nbd2"
+
+sudo apt install -y uuid-runtime
